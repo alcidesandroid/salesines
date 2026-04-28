@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>.::TIENDA PERSA::.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="bg-shape shape-1"></div>
+  <div class="bg-shape shape-2"></div>
+  <main class="app-shell container py-4 py-lg-5">
+    <section id="auth-view" class="auth-wrap">
+      <div class="auth-card">
+        <p class="eyebrow">TIENDITA PERSA</p>
+        <h1>Bienvenido</h1>
+        <p class="text-muted mb-4">Ingresa con tu correo y contraseña para gestionar clientes, productos y ventas.</p>
+        <form id="login-form" class="vstack gap-3">
+          <div>
+            <label for="correo" class="form-label">Correo</label>
+            <input id="correo" type="email" class="form-control form-control-lg" required>
+          </div>
+          <div>
+            <label for="clave" class="form-label">Contraseña</label>
+            <input id="clave" type="password" class="form-control form-control-lg" required minlength="6">
+          </div>
+          <div class="d-grid d-sm-flex gap-2">
+            <button class="btn btn-primary btn-lg flex-fill" type="submit">Ingresar</button>
+            <button class="btn btn-outline-primary btn-lg flex-fill" id="register-btn" type="button">Registrar</button>
+          </div>
+        </form>
+        <div id="auth-status" class="small mt-3"></div>
+      </div>
+    </section>
+
+    <section id="app-view" class="d-none">
+      <header class="topbar card-glass p-3 p-md-4 mb-4">
+        <div class="d-flex align-items-start justify-content-between flex-wrap gap-3">
+          <div>
+            <p class="eyebrow mb-1">Dashboard</p>
+            <h2 class="mb-1">TIENDITA PERSA</h2>
+            <p class="text-muted mb-0">Control de clientes, productos y ventas en tiempo real.</p>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="chip" id="user-email"></span>
+            <button id="logout-btn" class="btn btn-outline-dark btn-sm">Salir</button>
+          </div>
+        </div>
+      </header>
+
+      <section class="stats-grid mb-4">
+        <article class="stat-card">
+          <p>Clientes</p>
+          <h3 id="stat-clientes">0</h3>
+        </article>
+        <article class="stat-card">
+          <p>Productos</p>
+          <h3 id="stat-productos">0</h3>
+        </article>
+        <article class="stat-card">
+          <p>Ventas</p>
+          <h3 id="stat-ventas">0</h3>
+        </article>
+        <article class="stat-card">
+          <p>Total vendido</p>
+          <h3 id="stat-total">S/ 0.00</h3>
+        </article>
+      </section>
+
+      <section class="card-glass p-3 p-md-4 mb-5">
+        <nav class="module-tabs mb-4">
+          <button class="module-tab active" data-section="clientes"><i class="bi bi-people"></i> Clientes</button>
+          <button class="module-tab" data-section="productos"><i class="bi bi-box-seam"></i> Productos</button>
+          <button class="module-tab" data-section="ventas"><i class="bi bi-receipt"></i> Ventas</button>
+          <button class="module-tab" data-section="detventas"><i class="bi bi-list-check"></i> Detalle</button>
+          <button class="module-tab" data-section="resumen"><i class="bi bi-bar-chart"></i> Resumen</button>
+        </nav>
+
+        <div class="module-panel active" id="section-clientes">
+          <div class="row g-4">
+            <div class="col-lg-5">
+              <h4>Cliente</h4>
+              <form id="clientes-form" class="vstack gap-2">
+                <input type="text" id="cliente-codcli" class="form-control" placeholder="Código cliente (auto: C0001)" maxlength="6" required>
+                <input type="text" id="cliente-nombre" class="form-control" placeholder="Nombres y apellidos" maxlength="100" required>
+                <input type="text" id="cliente-area" class="form-control" placeholder="Área" maxlength="50" required>
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-primary flex-fill">Guardar</button>
+                  <button type="button" class="btn btn-light flex-fill" data-reset="clientes">Limpiar</button>
+                </div>
+              </form>
+            </div>
+            <div class="col-lg-7">
+              <div class="table-wrap">
+                <table class="table table-sm align-middle">
+                  <thead>
+                    <tr>
+                      <th>Código</th>
+                      <th>Nombre</th>
+                      <th>Área</th>
+                      <th class="text-end">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="clientes-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="module-panel" id="section-productos">
+          <div class="row g-4">
+            <div class="col-lg-5">
+              <h4>Producto</h4>
+              <form id="productos-form" class="vstack gap-2">
+                <input type="text" id="producto-codprod" class="form-control" placeholder="Código producto (auto: P0001)" maxlength="6" required>
+                <input type="text" id="producto-descripcion" class="form-control" placeholder="Descripción" maxlength="100" required>
+                <input type="text" id="producto-marca" class="form-control" placeholder="Marca" maxlength="50" required>
+                <input type="number" step="0.01" min="0" id="producto-precio" class="form-control" placeholder="Precio" required>
+                <input type="number" min="0" id="producto-stock" class="form-control" placeholder="Stock" required>
+                <input type="date" id="producto-fecha-vencimiento" class="form-control" required>
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-primary flex-fill">Guardar</button>
+                  <button type="button" class="btn btn-light flex-fill" data-reset="productos">Limpiar</button>
+                </div>
+              </form>
+            </div>
+            <div class="col-lg-7">
+              <div class="table-wrap">
+                <table class="table table-sm align-middle">
+                  <thead>
+                    <tr>
+                      <th>Código</th>
+                      <th>Producto</th>
+                      <th>Precio</th>
+                      <th>Stock</th>
+                      <th class="text-end">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="productos-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="module-panel" id="section-ventas">
+          <div class="row g-4">
+            <div class="col-lg-5">
+              <h4>Venta</h4>
+              <form id="ventas-form" class="vstack gap-2">
+                <input type="text" id="venta-codventa" class="form-control" placeholder="Código venta (auto: V0001)" maxlength="6" required>
+                <select id="venta-codcli" class="form-select" required></select>
+                <input type="date" id="venta-fechaventa" class="form-control" required>
+                <select id="venta-estado" class="form-select" required>
+                  <option value="PENDIENTE">PENDIENTE</option>
+                  <option value="CANCELADO">CANCELADO</option>
+                </select>
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-primary flex-fill">Guardar</button>
+                  <button type="button" class="btn btn-light flex-fill" data-reset="ventas">Limpiar</button>
+                </div>
+              </form>
+            </div>
+            <div class="col-lg-7">
+              <div class="table-wrap">
+                <table class="table table-sm align-middle">
+                  <thead>
+                    <tr>
+                      <th>Código</th>
+                      <th>Cliente</th>
+                      <th>Fecha</th>
+                      <th>Estado</th>
+                      <th class="text-end">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ventas-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="module-panel" id="section-detventas">
+          <div class="row g-4">
+            <div class="col-lg-5">
+              <h4>Detalle de venta</h4>
+              <form id="detventas-form" class="vstack gap-2">
+                <select id="detventa-codventa" class="form-select" required></select>
+                <select id="detventa-codprod" class="form-select" required></select>
+                <input type="date" id="detventa-fechaventa" class="form-control" required>
+                <input type="number" min="1" id="detventa-cantidad" class="form-control" placeholder="Cantidad" required>
+                <input type="number" step="0.01" min="0" id="detventa-precio" class="form-control" placeholder="Precio unitario (automático)" readonly required>
+                <input type="number" step="0.01" min="0" id="detventa-subtotal" class="form-control" placeholder="Subtotal" readonly required>
+                <input type="text" id="detventa-estado" class="form-control" placeholder="Estado de la venta (automático)" readonly required>
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-primary flex-fill">Guardar</button>
+                  <button type="button" class="btn btn-light flex-fill" data-reset="detventas">Limpiar</button>
+                </div>
+              </form>
+            </div>
+            <div class="col-lg-7">
+              <div class="table-wrap">
+                <table class="table table-sm align-middle">
+                  <thead>
+                    <tr>
+                      <th>Venta</th>
+                      <th>Producto</th>
+                      <th>Cant.</th>
+                      <th>Subtotal</th>
+                      <th class="text-end">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="detventas-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="module-panel" id="section-resumen">
+          <h4 class="mb-3">Resumen de ventas relacionadas</h4>
+          <div class="row g-2 g-md-3 align-items-end mb-3">
+            <div class="col-md-4">
+              <label for="resumen-filter-cliente" class="form-label mb-1">Cliente</label>
+              <select id="resumen-filter-cliente" class="form-select"></select>
+            </div>
+            <div class="col-md-4">
+              <label for="resumen-filter-periodo" class="form-label mb-1">Periodo</label>
+              <select id="resumen-filter-periodo" class="form-select"></select>
+            </div>
+            <div class="col-md-4">
+              <div class="resumen-card py-2 px-3">
+                <div class="small text-muted">Consumo en filtro</div>
+                <div class="fw-bold" id="resumen-consumo-cliente">S/ 0.00</div>
+                <div class="small text-muted" id="resumen-consumo-label">Todos los clientes</div>
+              </div>
+            </div>
+          </div>
+          <div id="resumen-body" class="vstack gap-3"></div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="status-toast" class="toast border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-body" id="toast-message"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="./config.js?v=20260427c"></script>
+  <script src="./app.js?v=20260427c"></script>
+</body>
+</html>
