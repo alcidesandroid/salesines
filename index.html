@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Tienda Persa — Sistema de control comercial para gestión de clientes, inventario de productos, ventas y reportes en tiempo real.">
+  <meta name="theme-color" content="#0f172a">
+  <title>Tienda Persa — Gestión Comercial y Ventas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,400;6..12,500;6..12,600;6..12,700&family=Rubik:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css?v=20261017a">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+
+  <main id="main-content" class="app-shell container py-4 py-lg-5">
+    <!-- VISTA DE AUTENTICACIÓN -->
+    <section id="auth-view" class="auth-wrap" aria-labelledby="auth-heading">
+      <div class="auth-card">
+        <div class="brand-header mb-4">
+          <span class="brand-mark" aria-hidden="true">
+            <i class="bi bi-shop"></i>
+          </span>
+          <span class="brand-pill">Tienda Persa · Sistema Comercial</span>
+        </div>
+
+        <h1 id="auth-heading" class="mb-2">Bienvenido de nuevo</h1>
+        <p class="text-secondary mb-4">Ingresa con tu correo y contraseña para administrar clientes, inventario de productos, ventas y cobranzas.</p>
+
+        <form id="login-form" class="vstack gap-3" novalidate>
+          <div>
+            <label for="correo" class="form-label">Correo electrónico</label>
+            <input id="correo" type="email" class="form-control form-control-lg" placeholder="nombre@empresa.com" autocomplete="email" required>
+          </div>
+          <div>
+            <label for="clave" class="form-label">Contraseña</label>
+            <div class="password-field-wrap">
+              <input id="clave" type="password" class="form-control form-control-lg pe-5" placeholder="Mínimo 6 caracteres" autocomplete="current-password" required minlength="6">
+              <button type="button" id="toggle-password-btn" class="btn-password-toggle" aria-label="Mostrar u ocultar contraseña" title="Mostrar u ocultar contraseña">
+                <i class="bi bi-eye" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          <div class="d-grid d-sm-flex gap-2 pt-2">
+            <button id="login-submit-btn" class="btn btn-primary btn-lg flex-fill" type="submit">
+              <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i> Ingresar
+            </button>
+            <button class="btn btn-outline-primary btn-lg flex-fill" id="register-btn" type="button">
+              <i class="bi bi-person-plus me-1" aria-hidden="true"></i> Registrar cuenta
+            </button>
+          </div>
+        </form>
+        <div id="auth-status" class="auth-feedback mt-3" role="status" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- VISTA PRINCIPAL DE LA APLICACIÓN -->
+    <section id="app-view" class="d-none" aria-label="Panel de control comercial">
+      <header class="topbar mb-4">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+          <div class="d-flex align-items-center gap-3">
+            <div class="brand-mark brand-mark-lg" aria-hidden="true">
+              <i class="bi bi-shop"></i>
+            </div>
+            <div>
+              <h2 class="mb-1">Tienda Persa</h2>
+              <p class="text-secondary mb-0">Control de clientes, inventario, ventas y cuentas por cobrar en tiempo real.</p>
+            </div>
+          </div>
+          <div class="d-flex align-items-center flex-wrap gap-2">
+            <span class="chip" id="user-email" title="Usuario autenticado"></span>
+            <button id="refresh-data-btn" class="btn btn-subtle btn-touch" type="button" title="Sincronizar datos">
+              <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+              <span>Actualizar</span>
+            </button>
+            <button id="logout-btn" class="btn btn-outline-dark btn-touch" type="button">
+              <i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i> Salir
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- INDICADORES CLAVE (KPIs) -->
+      <section class="stats-grid mb-4" aria-label="Indicadores generales">
+        <article class="stat-card">
+          <div class="stat-header">
+            <p class="stat-label">Clientes registrados</p>
+            <span class="stat-icon" aria-hidden="true"><i class="bi bi-people"></i></span>
+          </div>
+          <h3 id="stat-clientes" class="tabular-nums">0</h3>
+          <div class="stat-meta" id="stat-clientes-sub">Cartera activa</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-header">
+            <p class="stat-label">Productos en catálogo</p>
+            <span class="stat-icon" aria-hidden="true"><i class="bi bi-box-seam"></i></span>
+          </div>
+          <h3 id="stat-productos" class="tabular-nums">0</h3>
+          <div class="stat-meta" id="stat-productos-sub">Control de stock</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-header">
+            <p class="stat-label">Operaciones de venta</p>
+            <span class="stat-icon" aria-hidden="true"><i class="bi bi-receipt"></i></span>
+          </div>
+          <h3 id="stat-ventas" class="tabular-nums">0</h3>
+          <div class="stat-meta" id="stat-ventas-sub">Comprobantes emitidos</div>
+        </article>
+        <article class="stat-card stat-card-highlight">
+          <div class="stat-header">
+            <p class="stat-label">Total vendido</p>
+            <span class="stat-icon" aria-hidden="true"><i class="bi bi-cash-stack"></i></span>
+          </div>
+          <h3 id="stat-total" class="tabular-nums">S/ 0.00</h3>
+          <div class="stat-meta" id="stat-total-sub">Acumulado general</div>
+        </article>
+      </section>
+
+      <!-- NAVEGACIÓN DE MÓDULOS Y ÁREA DE TRABAJO -->
+      <section class="workspace-shell mb-5">
+        <nav class="module-tabs mb-4" role="tablist" aria-label="Módulos del sistema">
+          <button class="module-tab active" role="tab" aria-selected="true" aria-controls="section-clientes" id="tab-clientes" data-section="clientes" type="button">
+            <i class="bi bi-people" aria-hidden="true"></i>
+            <span>Clientes</span>
+          </button>
+          <button class="module-tab" role="tab" aria-selected="false" aria-controls="section-productos" id="tab-productos" data-section="productos" type="button">
+            <i class="bi bi-box-seam" aria-hidden="true"></i>
+            <span>Productos</span>
+          </button>
+          <button class="module-tab" role="tab" aria-selected="false" aria-controls="section-ventas" id="tab-ventas" data-section="ventas" type="button">
+            <i class="bi bi-receipt" aria-hidden="true"></i>
+            <span>Ventas</span>
+          </button>
+          <button class="module-tab" role="tab" aria-selected="false" aria-controls="section-detventas" id="tab-detventas" data-section="detventas" type="button">
+            <i class="bi bi-list-check" aria-hidden="true"></i>
+            <span>Detalle</span>
+          </button>
+          <button class="module-tab" role="tab" aria-selected="false" aria-controls="section-resumen" id="tab-resumen" data-section="resumen" type="button">
+            <i class="bi bi-bar-chart" aria-hidden="true"></i>
+            <span>Resumen</span>
+          </button>
+          <button class="module-tab" role="tab" aria-selected="false" aria-controls="section-reportes" id="tab-reportes" data-section="reportes" type="button">
+            <i class="bi bi-graph-up-arrow" aria-hidden="true"></i>
+            <span>Reportes</span>
+          </button>
+          <button class="module-tab" role="tab" aria-selected="false" aria-controls="section-vencimientos" id="tab-vencimientos" data-section="vencimientos" type="button">
+            <i class="bi bi-calendar-event" aria-hidden="true"></i>
+            <span>Vencimientos</span>
+          </button>
+        </nav>
+
+        <!-- MÓDULO 1: CLIENTES -->
+        <div class="module-panel active" id="section-clientes" role="tabpanel" aria-labelledby="tab-clientes">
+          <div class="row g-4 align-items-start">
+            <div class="col-lg-4">
+              <div class="panel-surface">
+                <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+                  <h4 class="mb-0">Registro de cliente</h4>
+                  <span id="form-mode-clientes" class="mode-pill">Nuevo</span>
+                </div>
+                <form id="clientes-form" class="vstack gap-3">
+                  <div>
+                    <label for="cliente-codcli" class="form-label">Código de cliente</label>
+                    <input type="text" id="cliente-codcli" class="form-control tabular-nums" placeholder="Ej. C0001" maxlength="6" required>
+                  </div>
+                  <div>
+                    <label for="cliente-nombre" class="form-label">Nombres y apellidos</label>
+                    <input type="text" id="cliente-nombre" class="form-control" placeholder="Ej. María Elena Quispe" maxlength="100" required>
+                  </div>
+                  <div>
+                    <label for="cliente-area" class="form-label">Área o dependencia</label>
+                    <input type="text" id="cliente-area" class="form-control" placeholder="Ej. Administración / Contabilidad" maxlength="50" required>
+                  </div>
+                  <div class="d-flex gap-2 pt-1">
+                    <button type="submit" id="submit-clientes" class="btn btn-primary flex-fill">
+                      <i class="bi bi-check2-circle me-1" aria-hidden="true"></i> <span>Guardar</span>
+                    </button>
+                    <button type="button" class="btn btn-subtle flex-fill" data-reset="clientes">Limpiar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="col-lg-8">
+              <div class="panel-surface">
+                <div class="panel-toolbar mb-3">
+                  <div>
+                    <h4 class="mb-0">Directorio de clientes</h4>
+                    <p class="text-secondary small mb-0">Gestiona los datos de tus clientes registrados.</p>
+                  </div>
+                  <div class="search-box">
+                    <i class="bi bi-search search-icon" aria-hidden="true"></i>
+                    <input type="search" id="search-clientes" class="form-control" placeholder="Buscar por código, nombre o área..." aria-label="Buscar clientes">
+                  </div>
+                </div>
+                <div class="table-wrap">
+                  <table class="table align-middle mb-0">
+                    <thead>
+                      <tr>
+                        <th scope="col">Código</th>
+                        <th scope="col">Nombre completo</th>
+                        <th scope="col">Área</th>
+                        <th scope="col" class="text-end">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody id="clientes-body"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MÓDULO 2: PRODUCTOS -->
+        <div class="module-panel" id="section-productos" role="tabpanel" aria-labelledby="tab-productos">
+          <div class="row g-4 align-items-start">
+            <div class="col-lg-4">
+              <div class="panel-surface">
+                <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+                  <h4 class="mb-0">Ficha de producto</h4>
+                  <span id="form-mode-productos" class="mode-pill">Nuevo</span>
+                </div>
+                <form id="productos-form" class="vstack gap-3">
+                  <div class="row g-2">
+                    <div class="col-sm-6">
+                      <label for="producto-codprod" class="form-label">Código</label>
+                      <input type="text" id="producto-codprod" class="form-control tabular-nums" placeholder="P0001" maxlength="6" required>
+                    </div>
+                    <div class="col-sm-6">
+                      <label for="producto-marca" class="form-label">Marca</label>
+                      <input type="text" id="producto-marca" class="form-control" placeholder="Ej. Gloria" maxlength="50" required>
+                    </div>
+                  </div>
+                  <div>
+                    <label for="producto-descripcion" class="form-label">Descripción del producto</label>
+                    <input type="text" id="producto-descripcion" class="form-control" placeholder="Ej. Leche evaporada 400g" maxlength="100" required>
+                  </div>
+                  <div class="row g-2">
+                    <div class="col-sm-6">
+                      <label for="producto-precio" class="form-label">Precio unitario (S/)</label>
+                      <input type="number" step="0.01" min="0" id="producto-precio" class="form-control tabular-nums" placeholder="0.00" required>
+                    </div>
+                    <div class="col-sm-6">
+                      <label for="producto-stock" class="form-label">Stock disponible</label>
+                      <input type="number" min="0" id="producto-stock" class="form-control tabular-nums" placeholder="0" required>
+                    </div>
+                  </div>
+                  <div>
+                    <label for="producto-fecha-vencimiento" class="form-label">Fecha de vencimiento</label>
+                    <input type="date" id="producto-fecha-vencimiento" class="form-control tabular-nums" required>
+                  </div>
+                  <div class="d-flex gap-2 pt-1">
+                    <button type="submit" id="submit-productos" class="btn btn-primary flex-fill">
+                      <i class="bi bi-check2-circle me-1" aria-hidden="true"></i> <span>Guardar</span>
+                    </button>
+                    <button type="button" class="btn btn-subtle flex-fill" data-reset="productos">Limpiar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="col-lg-8">
+              <div class="panel-surface">
+                <div class="panel-toolbar mb-3">
+                  <div>
+                    <h4 class="mb-0">Inventario de productos</h4>
+                    <p class="text-secondary small mb-0">Precios, existencias y control de catálogo.</p>
+                  </div>
+                  <div class="search-box">
+                    <i class="bi bi-search search-icon" aria-hidden="true"></i>
+                    <input type="search" id="search-productos" class="form-control" placeholder="Buscar producto o marca..." aria-label="Buscar productos">
+                  </div>
+                </div>
+                <div class="table-wrap">
+                  <table class="table align-middle mb-0">
+                    <thead>
+                      <tr>
+                        <th scope="col">Código</th>
+                        <th scope="col">Producto / Marca</th>
+                        <th scope="col">Precio</th>
+                        <th scope="col">Stock</th>
+                        <th scope="col" class="text-end">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody id="productos-body"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MÓDULO 3: VENTAS -->
+        <div class="module-panel" id="section-ventas" role="tabpanel" aria-labelledby="tab-ventas">
+          <div class="row g-4 align-items-start">
+            <div class="col-lg-4">
+              <div class="panel-surface">
+                <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+                  <h4 class="mb-0">Cabecera de venta</h4>
+                  <span id="form-mode-ventas" class="mode-pill">Nueva</span>
+                </div>
+                <form id="ventas-form" class="vstack gap-3">
+                  <div>
+                    <label for="venta-codventa" class="form-label">Código de venta</label>
+                    <input type="text" id="venta-codventa" class="form-control tabular-nums" placeholder="V0001" maxlength="6" required>
+                  </div>
+                  <div>
+                    <label for="venta-codcli" class="form-label">Cliente</label>
+                    <input id="venta-codcli" class="form-control" list="venta-codcli-list" placeholder="Busca por código o nombre..." autocomplete="off" required>
+                    <datalist id="venta-codcli-list"></datalist>
+                  </div>
+                  <div class="row g-2">
+                    <div class="col-sm-6">
+                      <label for="venta-fechaventa" class="form-label">Fecha de emisión</label>
+                      <input type="date" id="venta-fechaventa" class="form-control tabular-nums" required>
+                    </div>
+                    <div class="col-sm-6">
+                      <label for="venta-estado" class="form-label">Estado de pago</label>
+                      <select id="venta-estado" class="form-select" required>
+                        <option value="PENDIENTE">PENDIENTE</option>
+                        <option value="CANCELADO">CANCELADO</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="d-flex gap-2 pt-1">
+                    <button type="submit" id="submit-ventas" class="btn btn-primary flex-fill">
+                      <i class="bi bi-check2-circle me-1" aria-hidden="true"></i> <span>Guardar</span>
+                    </button>
+                    <button type="button" class="btn btn-subtle flex-fill" data-reset="ventas">Limpiar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="col-lg-8">
+              <div class="panel-surface">
+                <div class="panel-toolbar mb-3">
+                  <div>
+                    <h4 class="mb-0">Registro de ventas</h4>
+                    <p class="text-secondary small mb-0">Comprobantes emitidos y estado de cobranza.</p>
+                  </div>
+                  <div class="search-box">
+                    <i class="bi bi-search search-icon" aria-hidden="true"></i>
+                    <input type="search" id="search-ventas" class="form-control" placeholder="Buscar por venta, cliente o fecha..." aria-label="Buscar ventas">
+                  </div>
+                </div>
+                <div class="table-wrap">
+                  <table class="table align-middle mb-0">
+                    <thead>
+                      <tr>
+                        <th scope="col">Código</th>
+                        <th scope="col">Cliente</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col" class="text-end">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody id="ventas-body"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MÓDULO 4: DETALLE DE VENTA -->
+        <div class="module-panel" id="section-detventas" role="tabpanel" aria-labelledby="tab-detventas">
+          <div class="row g-4 align-items-start">
+            <div class="col-lg-4">
+              <div class="panel-surface">
+                <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+                  <h4 class="mb-0">Línea de detalle</h4>
+                  <span id="form-mode-detventas" class="mode-pill">Nueva</span>
+                </div>
+                <form id="detventas-form" class="vstack gap-3">
+                  <div>
+                    <label for="detventa-codventa" class="form-label">Comprobante de venta</label>
+                    <select id="detventa-codventa" class="form-select tabular-nums" required></select>
+                  </div>
+                  <div>
+                    <label for="detventa-codprod" class="form-label">Producto</label>
+                    <select id="detventa-codprod" class="form-select" required></select>
+                  </div>
+                  <div class="row g-2">
+                    <div class="col-sm-6">
+                      <label for="detventa-cantidad" class="form-label">Cantidad</label>
+                      <input type="number" min="1" id="detventa-cantidad" class="form-control tabular-nums" placeholder="1" required>
+                    </div>
+                    <div class="col-sm-6">
+                      <label for="detventa-precio" class="form-label">Precio unit. (S/)</label>
+                      <input type="number" step="0.01" min="0" id="detventa-precio" class="form-control field-locked tabular-nums" placeholder="0.00" readonly aria-readonly="true" required>
+                    </div>
+                  </div>
+                  <div class="row g-2">
+                    <div class="col-sm-6">
+                      <label for="detventa-subtotal" class="form-label">Subtotal (S/)</label>
+                      <input type="number" step="0.01" min="0" id="detventa-subtotal" class="form-control field-locked fw-bold tabular-nums" placeholder="0.00" readonly aria-readonly="true" required>
+                    </div>
+                    <div class="col-sm-6">
+                      <label for="detventa-fechaventa" class="form-label">Fecha de venta</label>
+                      <input type="date" id="detventa-fechaventa" class="form-control field-locked tabular-nums" readonly aria-readonly="true" required>
+                    </div>
+                  </div>
+                  <div>
+                    <label for="detventa-estado" class="form-label">Estado de la venta</label>
+                    <input type="text" id="detventa-estado" class="form-control field-locked" placeholder="Automático según venta" readonly aria-readonly="true" required>
+                  </div>
+                  <div class="d-flex gap-2 pt-1">
+                    <button type="submit" id="submit-detventas" class="btn btn-primary flex-fill">
+                      <i class="bi bi-check2-circle me-1" aria-hidden="true"></i> <span>Guardar</span>
+                    </button>
+                    <button type="button" class="btn btn-subtle flex-fill" data-reset="detventas">Limpiar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="col-lg-8">
+              <div class="panel-surface">
+                <div class="panel-toolbar mb-3">
+                  <div>
+                    <h4 class="mb-0">Ítems vendidos por operación</h4>
+                    <p class="text-secondary small mb-0">Desglose de productos, cantidades y subtotales.</p>
+                  </div>
+                  <div class="search-box">
+                    <i class="bi bi-search search-icon" aria-hidden="true"></i>
+                    <input type="search" id="search-detventas" class="form-control" placeholder="Filtrar por venta o producto..." aria-label="Buscar detalles de venta">
+                  </div>
+                </div>
+                <div class="table-wrap">
+                  <table class="table align-middle mb-0">
+                    <thead>
+                      <tr>
+                        <th scope="col">Venta</th>
+                        <th scope="col">Producto</th>
+                        <th scope="col">Cant.</th>
+                        <th scope="col">Subtotal</th>
+                        <th scope="col" class="text-end">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody id="detventas-body"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MÓDULO 5: RESUMEN -->
+        <div class="module-panel" id="section-resumen" role="tabpanel" aria-labelledby="tab-resumen">
+          <div class="panel-surface mb-4">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+              <div>
+                <h4 class="mb-1">Resumen detallado de ventas por cliente</h4>
+                <p class="text-secondary small mb-0">Filtra por cliente, periodo o estado de cobranza y actualiza estados con un clic.</p>
+              </div>
+            </div>
+            <div class="row g-3 align-items-end">
+              <div class="col-md-3">
+                <label for="resumen-filter-cliente" class="form-label mb-1">Cliente</label>
+                <input id="resumen-filter-cliente" class="form-control" list="resumen-filter-cliente-list" placeholder="Código o nombre del cliente" autocomplete="off">
+                <datalist id="resumen-filter-cliente-list"></datalist>
+              </div>
+              <div class="col-md-3">
+                <label for="resumen-filter-periodo" class="form-label mb-1">Periodo</label>
+                <select id="resumen-filter-periodo" class="form-select"></select>
+              </div>
+              <div class="col-md-3">
+                <label for="resumen-filter-estado" class="form-label mb-1">Estado</label>
+                <select id="resumen-filter-estado" class="form-select"></select>
+              </div>
+              <div class="col-md-3">
+                <div class="summary-total-box">
+                  <div class="small text-secondary">Consumo en filtro</div>
+                  <div class="summary-amount tabular-nums" id="resumen-consumo-cliente">S/ 0.00</div>
+                  <div class="small text-secondary text-truncate" id="resumen-consumo-label">Todos los clientes</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="resumen-body" class="resumen-grid"></div>
+        </div>
+
+        <!-- MÓDULO 6: REPORTES Y GRÁFICOS -->
+        <div class="module-panel" id="section-reportes" role="tabpanel" aria-labelledby="tab-reportes">
+          <div class="mb-3">
+            <h4 class="mb-1">Analítica comercial y exportación A4</h4>
+            <p class="text-secondary small mb-0">Visualiza la evolución mensual, los principales compradores, las cuentas por cobrar y genera estados de cuenta listos para imprimir.</p>
+          </div>
+          <div class="report-grid">
+            <article class="report-card">
+              <div class="report-title">Evolución de ventas mensuales</div>
+              <div class="chart-wrap"><canvas id="chart-ventas-mensuales"></canvas></div>
+            </article>
+            <article class="report-card">
+              <div class="report-title">Top clientes con mayor consumo</div>
+              <div class="chart-wrap"><canvas id="chart-top-clientes"></canvas></div>
+            </article>
+            <article class="report-card">
+              <div class="report-title">Clientes con saldo pendiente por cobrar</div>
+              <div class="chart-wrap"><canvas id="chart-deuda-pendiente"></canvas></div>
+            </article>
+            <article class="report-card report-print">
+              <div class="report-title">Exportar e imprimir estado de cuenta (A4)</div>
+              <p class="small text-secondary mb-3">Genera un documento estructurado en formato A4 con el desglose de ventas y saldos por cliente.</p>
+              <div class="vstack gap-3">
+                <div>
+                  <label for="reporte-print-cliente" class="form-label mb-1">Seleccionar cliente</label>
+                  <input id="reporte-print-cliente" class="form-control" list="reporte-print-cliente-list" placeholder="Escribe código o nombre del cliente" autocomplete="off">
+                  <datalist id="reporte-print-cliente-list"></datalist>
+                </div>
+                <div>
+                  <label for="reporte-print-estado" class="form-label mb-1">Filtrar por estado</label>
+                  <select id="reporte-print-estado" class="form-select"></select>
+                </div>
+                <button id="reporte-print-btn" class="btn btn-primary w-100 mt-1" type="button">
+                  <i class="bi bi-printer me-1" aria-hidden="true"></i> Ver e imprimir reporte A4
+                </button>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <!-- MÓDULO 7: FECHA DE VENCIMIENTO -->
+        <div class="module-panel" id="section-vencimientos" role="tabpanel" aria-labelledby="tab-vencimientos">
+          <div class="panel-surface">
+            <div class="panel-toolbar mb-3">
+              <div>
+                <h4 class="mb-1">Control de fechas de vencimiento</h4>
+                <p class="text-secondary small mb-0">Monitoreo preventivo de lotes vencidos, próximos a vencer (30 días) y vigentes.</p>
+              </div>
+              <div class="d-flex flex-wrap gap-2 align-items-center">
+                <select id="filter-vencimientos-estado" class="form-select form-select-filter" aria-label="Filtrar por estado de vencimiento">
+                  <option value="ALL">Todos los estados</option>
+                  <option value="VENCIDO">Vencidos</option>
+                  <option value="POR_VENCER">Por vencer (≤ 30 días)</option>
+                  <option value="VIGENTE">Vigentes</option>
+                </select>
+                <div class="search-box">
+                  <i class="bi bi-search search-icon" aria-hidden="true"></i>
+                  <input type="search" id="search-vencimientos" class="form-control" placeholder="Buscar producto..." aria-label="Buscar en vencimientos">
+                </div>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="table align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th scope="col">Código</th>
+                    <th scope="col">Producto / Marca</th>
+                    <th scope="col">Fecha de Venc.</th>
+                    <th scope="col">Días Restantes</th>
+                    <th scope="col">Stock</th>
+                    <th scope="col">Estado</th>
+                  </tr>
+                </thead>
+                <tbody id="vencimientos-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <!-- NOTIFICACIONES TOAST -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="status-toast" class="toast border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-body d-flex align-items-center gap-2" id="toast-message"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="./config.js?v=20261017a"></script>
+  <script src="./app.js?v=20261017a"></script>
+</body>
+</html>
