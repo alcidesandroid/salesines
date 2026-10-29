@@ -934,6 +934,8 @@
 
   function renderDetventas() {
     const byProd = new Map(state.productos.map((p) => [p.codprod, p]));
+    const byVenta = new Map(state.ventas.map((v) => [v.codventa, v]));
+    const byCli = new Map(state.clientes.map((c) => [c.codcli, c]));
     const body = $("detventas-body");
     if (!body) return;
     const query = ($("search-detventas") ? $("search-detventas").value : "").trim().toLowerCase();
@@ -941,15 +943,19 @@
       if (!query) return true;
       const p = byProd.get(row.codprod);
       const prodName = p ? p.descripcion : row.codprod;
+      const v = byVenta.get(row.codventa);
+      const cli = v ? byCli.get(v.codcli) : null;
+      const cliName = cli ? cli.nombres_apellido : (v ? v.codcli : "");
       return (
         String(row.codventa || "").toLowerCase().includes(query) ||
+        String(cliName || "").toLowerCase().includes(query) ||
         String(prodName || "").toLowerCase().includes(query)
       );
     });
 
     if (!filtered.length) {
       body.innerHTML = renderEmptyRow(
-        5,
+        6,
         query ? "No se encontraron líneas de detalle para esa búsqueda." : "Aún no hay detalles de venta registrados.",
         "bi-list-check"
       );
@@ -960,9 +966,13 @@
       .map((row) => {
         const p = byProd.get(row.codprod);
         const prodLabel = p ? p.descripcion : row.codprod;
+        const v = byVenta.get(row.codventa);
+        const cli = v ? byCli.get(v.codcli) : null;
+        const cliLabel = cli ? cli.nombres_apellido : (v && v.codcli ? v.codcli : "-");
         return `
           <tr>
             <td class="fw-semibold tabular-nums">${escapeHtml(row.codventa)}</td>
+            <td class="fw-medium">${escapeHtml(cliLabel)}</td>
             <td class="fw-medium">${escapeHtml(prodLabel)}</td>
             <td class="tabular-nums">${escapeHtml(row.cantidad)}</td>
             <td class="fw-semibold tabular-nums">${formatMoney(row.subtotal)}</td>
